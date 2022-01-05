@@ -1,0 +1,35 @@
+@startuml
+skinparam defaultFontName Verdana
+title Luồng Xử lý Log trong dự án OCS Gateway
+hide footbox
+autonumber "<b>[0]"
+
+LogFileScanner -> LogFileScanner: scan new log file\nevery 10 seconds
+
+LogFileScanner -> LogFileProcessingFactory: new LogFileProcessingFactory(file.getName())
+
+LogFileProcessingFactory -> LogFileProcessingFactory: simple factory method
+
+LogFileProcessingFactory --> LogFileScanner: return (iLogFileParser, iGenerateInsertQuery)
+
+LogFileScanner -> LogFileProcessingThead: new LogFileProcessingThead\n(iLogFileParser, iGenerateInsertQuery, file)
+note left
+  init new Thread
+  for handling log file
+end note
+
+LogFileProcessingThead -> LogFileProcessingThead: read log file
+note left
+  use iLogFileParser
+end note
+
+LogFileProcessingThead -> LogFileProcessingThead: generate native query\nfor inserting log into database
+note left
+  use iGenerateInsertQuery
+end note
+
+LogFileProcessingThead --> LogFileScanner: job done
+
+LogFileScanner -> LogFileScanner: kill thread
+
+@enduml

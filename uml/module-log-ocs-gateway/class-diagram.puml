@@ -1,0 +1,44 @@
+@startuml
+skinparam defaultFontName Verdana
+title Sơ đồ thiết kế lớp trong module Xử lý Log trong dự án OCS Gateway
+
+class LogFileScanner
+class LogFileProcessingThead<T> implements Runnable {
+  - ILogFileParser<T> iLogFileParser;
+  - IGenerateInsertQuery<T> iGenerateInsertQuery;
+  - File logFile;
+  + run();
+}
+class LogFileProcessingFactory {
+  + LogFileProcessingFactory(ILogFileParser, IGenerateInsertQuery);
+}
+
+interface ILogFileParser<T> {
+  List<T> parser(File);
+}
+
+interface IGenerateInsertQuery<T> {
+  String generateInsertQuery(List<T> list, String schema);
+}
+
+class InTransLogFileParserImpl implements ILogFileParser{
+  List<InTransaction> parser(File);
+}
+class InTransGenerateInsertQueryImpl implements IGenerateInsertQuery {
+  String generateInsertQuery(List<InTransaction> list, String schema);
+}
+
+class ActivityLogFileParserImpl implements ILogFileParser{
+  List<Activity> parser(File);
+}
+class ActivityGenerateInsertQueryImpl implements IGenerateInsertQuery {
+  String generateInsertQuery(List<Activity> list, String schema);
+}
+
+LogFileScanner -- LogFileProcessingFactory
+LogFileScanner -- LogFileProcessingThead
+
+LogFileProcessingThead --* IGenerateInsertQuery
+LogFileProcessingThead --* ILogFileParser
+
+@enduml
